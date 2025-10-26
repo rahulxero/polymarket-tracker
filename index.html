@@ -14,23 +14,23 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-screen">
+<body class="bg-black min-h-screen">
     <div class="max-w-7xl mx-auto p-4 md:p-8">
         <!-- Header -->
         <div class="text-center mb-12">
             <div class="flex items-center justify-center mb-4">
-                <svg class="w-12 h-12 text-purple-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-12 h-12 text-white mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
                 <h1 class="text-4xl md:text-5xl font-bold text-white">
                     Polymarket Top Traders
                 </h1>
             </div>
-            <p class="text-purple-200 text-lg">
+            <p class="text-gray-400 text-lg">
                 Track the most profitable traders on Polymarket
             </p>
             <div class="flex items-center justify-center mt-4 space-x-4">
-                <div id="lastUpdate" class="flex items-center text-purple-300 text-sm">
+                <div id="lastUpdate" class="flex items-center text-gray-400 text-sm">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
@@ -39,7 +39,7 @@
                 <button
                     onclick="fetchTopTraders()"
                     id="refreshBtn"
-                    class="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                    class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors text-sm font-medium"
                 >
                     <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -52,13 +52,13 @@
         <!-- Loading -->
         <div id="loading" class="flex items-center justify-center py-20">
             <div class="text-center">
-                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-400 mx-auto mb-4"></div>
-                <p class="text-purple-200 text-lg">Loading top traders...</p>
+                <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mx-auto mb-4"></div>
+                <p class="text-gray-400 text-lg">Loading top traders...</p>
             </div>
         </div>
 
         <!-- Error -->
-        <div id="error" class="hidden bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded-lg mb-6">
+        <div id="error" class="hidden bg-red-900/30 border border-red-600 text-red-200 px-4 py-3 rounded-lg mb-6">
             <p id="errorMessage"></p>
         </div>
 
@@ -66,7 +66,7 @@
         <div id="tradersList" class="space-y-4 hidden"></div>
 
         <!-- Footer -->
-        <div class="text-center mt-12 text-purple-300 text-sm">
+        <div class="text-center mt-12 text-gray-500 text-sm">
             Data sourced from Polymarket API
         </div>
     </div>
@@ -105,7 +105,6 @@
             error.classList.add('hidden');
 
             try {
-                // Using a CORS proxy for demo purposes
                 const response = await fetch('/api/leaderboard');
                 
                 if (!response.ok) {
@@ -122,7 +121,7 @@
             } catch (err) {
                 console.error('Error:', err);
                 document.getElementById('errorMessage').textContent = 
-                    'Failed to load trader data. The API may be blocking direct browser requests. This will work when deployed to Vercel with API routes.';
+                    'Failed to load trader data. Please try again.';
                 error.classList.remove('hidden');
             } finally {
                 isLoading = false;
@@ -144,15 +143,15 @@
                 const winRate = trader.win_rate || 0;
 
                 const traderCard = `
-                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-purple-500/30 hover:border-purple-400/50 transition-all">
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-zinc-700 transition-all">
                         <div class="flex items-center justify-between flex-wrap gap-4">
                             <div class="flex items-center space-x-4">
-                                <div class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-lg">
+                                <div class="bg-white text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">
                                     #${index + 1}
                                 </div>
                                 <div>
                                     <div class="flex items-center space-x-2">
-                                        <svg class="w-5 h-5 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                         </svg>
                                         <span class="text-white font-mono text-lg">
@@ -160,18 +159,18 @@
                                         </span>
                                     </div>
                                     <div class="flex items-center space-x-4 mt-2 flex-wrap gap-2">
-                                        <div class="flex items-center text-green-400">
+                                        <div class="flex items-center text-white">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                             <span class="font-semibold">${formatMoney(profit)}</span>
-                                            <span class="text-purple-300 text-sm ml-1">profit</span>
+                                            <span class="text-gray-400 text-sm ml-1">profit</span>
                                         </div>
-                                        <div class="text-purple-300 text-sm">
+                                        <div class="text-gray-400 text-sm">
                                             ${formatMoney(volume)} volume
                                         </div>
-                                        ${markets > 0 ? `<div class="text-purple-300 text-sm">${markets} markets</div>` : ''}
-                                        ${winRate > 0 ? `<div class="text-purple-300 text-sm">${winRate}% win rate</div>` : ''}
+                                        ${markets > 0 ? `<div class="text-gray-400 text-sm">${markets} markets</div>` : ''}
+                                        ${winRate > 0 ? `<div class="text-gray-400 text-sm">${winRate}% win rate</div>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -179,7 +178,7 @@
                                 href="https://polymarket.com/profile/${account}"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                                class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors text-sm font-medium"
                             >
                                 <span>View Profile</span>
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
