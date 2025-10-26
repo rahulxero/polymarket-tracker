@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polymarket Top Traders</title>
+    <title>Polymarket Top Traders by Volume</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @keyframes spin {
@@ -23,11 +23,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
                 </svg>
                 <h1 class="text-4xl md:text-5xl font-bold text-white">
-                    Polymarket Top Traders
+                    Top Traders by Volume
                 </h1>
             </div>
             <p class="text-gray-400 text-lg">
-                Track the most profitable traders on Polymarket
+                All-time highest volume traders with bets ≥ $1,000
             </p>
             <div class="flex items-center justify-center mt-4 space-x-4">
                 <div id="lastUpdate" class="flex items-center text-gray-400 text-sm">
@@ -63,7 +63,7 @@
         </div>
 
         <!-- Traders List -->
-        <div id="tradersList" class="space-y-4 hidden"></div>
+        <div id="tradersList" class="space-y-6 hidden"></div>
 
         <!-- Footer -->
         <div class="text-center mt-12 text-gray-500 text-sm">
@@ -86,6 +86,20 @@
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0,
             }).format(value);
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
         }
 
         async function fetchTopTraders() {
@@ -112,9 +126,7 @@
                 }
 
                 const data = await response.json();
-                const topTraders = data.slice(0, 10);
-
-                displayTraders(topTraders);
+                displayTraders(data);
                 
                 const now = new Date();
                 document.getElementById('updateTime').textContent = `Last updated: ${now.toLocaleTimeString()}`;
@@ -141,10 +153,44 @@
                 const volume = trader.volume || trader.total_volume || 0;
                 const markets = trader.markets_traded || 0;
                 const winRate = trader.win_rate || 0;
+                const recentBets = trader.recentBets || [];
+
+                let betsHTML = '';
+                if (recentBets.length > 0) {
+                    betsHTML = `
+                        <div class="mt-4 pt-4 border-t border-zinc-800">
+                            <h3 class="text-gray-400 text-sm font-semibold mb-3">Recent Bets ≥ $1,000</h3>
+                            <div class="space-y-2">
+                                ${recentBets.map(bet => `
+                                    <div class="bg-zinc-800/50 rounded-lg p-3 hover:bg-zinc-800 transition-colors">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex-1 min-w-0">
+                                                <p class="text-white text-sm font-medium truncate">${bet.market}</p>
+                                                <div class="flex items-center gap-3 mt-1 text-xs">
+                                                    <span class="text-gray-400">${formatTime(bet.timestamp)}</span>
+                                                    ${bet.outcome ? `<span class="px-2 py-0.5 bg-zinc-700 text-gray-300 rounded">${bet.outcome}</span>` : ''}
+                                                </div>
+                                            </div>
+                                            <div class="text-white font-semibold text-sm whitespace-nowrap">
+                                                ${formatMoney(bet.amount)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    betsHTML = `
+                        <div class="mt-4 pt-4 border-t border-zinc-800">
+                            <p class="text-gray-500 text-sm italic">No recent bets ≥ $1,000</p>
+                        </div>
+                    `;
+                }
 
                 const traderCard = `
                     <div class="bg-zinc-900 border border-zinc-800 rounded-lg p-6 hover:border-zinc-700 transition-all">
-                        <div class="flex items-center justify-between flex-wrap gap-4">
+                        <div class="flex items-center justify-between flex-wrap gap-4 mb-4">
                             <div class="flex items-center space-x-4">
                                 <div class="bg-white text-black rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl">
                                     #${index + 1}
@@ -161,13 +207,16 @@
                                     <div class="flex items-center space-x-4 mt-2 flex-wrap gap-2">
                                         <div class="flex items-center text-white">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                                            </svg>
+                                            <span class="font-semibold">${formatMoney(volume)}</span>
+                                            <span class="text-gray-400 text-sm ml-1">volume</span>
+                                        </div>
+                                        <div class="flex items-center text-gray-400 text-sm">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            <span class="font-semibold">${formatMoney(profit)}</span>
-                                            <span class="text-gray-400 text-sm ml-1">profit</span>
-                                        </div>
-                                        <div class="text-gray-400 text-sm">
-                                            ${formatMoney(volume)} volume
+                                            ${formatMoney(profit)} profit
                                         </div>
                                         ${markets > 0 ? `<div class="text-gray-400 text-sm">${markets} markets</div>` : ''}
                                         ${winRate > 0 ? `<div class="text-gray-400 text-sm">${winRate}% win rate</div>` : ''}
@@ -186,6 +235,7 @@
                                 </svg>
                             </a>
                         </div>
+                        ${betsHTML}
                     </div>
                 `;
                 
